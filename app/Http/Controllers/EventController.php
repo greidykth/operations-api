@@ -15,6 +15,12 @@ class EventController extends Controller
                 $request->amount
             );
         }
+        if($request->type === 'withdraw'){
+            return $this->withdraw(
+                $request->origin,
+                $request->amount
+            );
+        }
     }
 
     private function deposit($destination, $amount)
@@ -28,6 +34,20 @@ class EventController extends Controller
 
         return response()->json([
             'destination' => [
+                'id' => $account->id,
+                'balance' => $account->balance
+        ]], 201);
+    }
+
+    private function withdraw($origin, $amount)
+    {
+        $account = Account::findOrFail($origin);
+
+        $account->balance -= $amount;
+        $account->save();
+
+        return response()->json([
+            'origin' => [
                 'id' => $account->id,
                 'balance' => $account->balance
         ]], 201);
